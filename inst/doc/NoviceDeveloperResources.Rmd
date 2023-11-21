@@ -1,0 +1,185 @@
+---
+title: "NoviceDeveloperResources"
+author: Barry Zeeberg [aut, cre]
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{NoviceDeveloperResources}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+
+<p class=MsoNormal align=center style='text-align:center'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;font-family:"Times New Roman",serif'><o:p>&nbsp;</o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;font-family:"Times New Roman",serif'><o:p>&nbsp;</o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;font-family:"Times New Roman",serif'>Barry
+Zeeberg<o:p></o:p></span></b></p>
+
+<p class=MsoNormal align=center style='text-align:center'><b style='mso-bidi-font-weight:
+normal'><span style='font-size:16.0pt;font-family:"Times New Roman",serif'>barryz2013@gmail.com<o:p></o:p></span></b></p><br>
+
+<p class=MsoNormal style='text-align:justify'><span style='font-size:16.0pt;
+font-family:"Times New Roman",serif'><o:p>&nbsp;</o:p></span></p>
+
+<center>
+**MOTIVATION**
+</center>
+
+This is a short manual that I wish I had when I was trying to figure out
+how to get started, and how to continue. The vocabulary that more
+experienced developers use has terminology that is not that helpful to
+an uninitiated novice. And there are several types of objects that
+reside in various obscure places on your computer, and a collection of
+commands to view or operate on these objects. Finally, the commands can
+be issued from 4 different places: The UNIX terminal window (*e.g.,* on
+Macintosh computers), the R Console window, the R Studio menus, or the R
+Studio console. I will focus here on operating and navigating within the
+R Console window, which can be considered to be necessary and
+sufficient.
+
+<center>
+**BASIC COMMANDS**
+</center>
+
+A *package* is a unified integrated set of functions and objects that
+can be installed by users of R. A few of these automatically come along
+with the R program, but the others must be *installed* (usually from the
+*CRAN repository*, which you can browse through to find the package that
+you seek) by issuing
+
+**install.packages("package-name")**
+
+The collection of your installed packages is called a *library*,
+residing in *e.g.,*
+/Library/Frameworks/R.framework/Versions/4.3-arm64/Resources/library.
+All of your installed packages can be viewed by issuing
+
+**library()**
+
+The output (Figure 1) can be a very long list, if you have been doing
+this for a while, and is printed out in a separate window, presumably to
+avoid cluttering up the main R Console window.
+
+![](Picture1.jpg)
+
+Figure 1. Output of library() command.
+
+The installed libraries are not directly available for your use, until
+you have *attached* them or (in different words for the same thing)
+*loaded* them to your *search* path. Here we encounter the confusing
+syntax: you attach a package by issuing
+
+**library(package-name)**
+
+It would make more sense for the command to be something like
+*attach(package-name)*, since, as just discussed above, library() has a
+completely different meaning, and the opposite command is
+
+**detach(package:package-name)**
+
+which removes the package from the search path.
+
+To make matters even more confusing, the argument to *install.packages()* is the package-name in quotation marks; the argument to *library()* is the package-name without quotation marks; and the argument to *detach()* is the form of the package-name that appears as the output of *search()*, which is like *package:package-name* without quotation marks!
+
+You can confirm that you have successfully loaded or removed the package
+by issuing
+
+**search()**
+
+which shows what is attached to your search path (Figure 2).
+
+![](Picture2.jpg)
+
+Figure 2. Output of search(), library(), and detach() commands.
+
+The functions within the loaded packages are available for you to access
+and use in your own R code or program. The names of these functions can
+be found by issuing (Figure 3)
+
+**getNamespaceExports("package-name")**
+
+![](Picture3.jpg)
+
+Figure 3. Output of getNamespaceExports() command.
+
+I mentioned above that packages can be installed on your computer by
+download from the CRAN repository. If you develop your own package, then
+you may want to eventually submit it to CRAN. But before you submit it,
+you need to do two things:
+
+First, you need to build a .tar.gz *source package*, which is the format
+that is required for uploading to CRAN. That can be accomplished by
+
+**setwd(p) \# p is the pathname to your package**
+
+**devtools::document(roclets = c(\'rd\', \'collate\', \'namespace\',
+\'vignette\'))**
+
+**b\<-devtools::build()**
+
+The resulting .tar.gz source package will be located in the same
+directory as that containing your package (Figure 4). The returned
+parameter *b* is the path name for the .tar.gz source package.
+
+![](Picture4.jpg)
+
+Figure 4. Location of .tar.gz source package
+
+Second, in order to use or test the functions within the source package,
+you need to install the source package on your computer from your local directory (in
+contrast to installing it from CRAN). That can be accomplished by
+
+**install.packages(b,repos=NULL,type=\'source\')**
+
+where b is the path name for the .tar.gz source package that had been
+returned by *b\<-devtools::build()* in the previous example.
+
+The several commands in the sequence to take package folders containing
+your raw R program file to a functional package attached to your search
+path are not too tedious to execute once or twice. But if you are
+developing a set of inter-related packages, and you need to fine tune
+them, the process can become quite repetitive, confusing, and tedious.
+To facilitate this, within the *NoviceDeveloperResources* package I have
+provided the function
+
+**checkBuildInstallSourcePackage(dir,packs)**
+
+where *dir* is a character string containing the path name of the
+directory holding the package folders, and *packs* is a character vector
+of the names of the packages.
+
+<center>
+**CONFLICT RESOLUTION**
+</center>
+
+When you are developing the functions for your package, you may work
+back and forth between the R Console and R Studio. This may not be the
+best practice, but it has certain advantages. For instance, if you are
+debugging one of your functions, it is rather tedious to edit a change
+within R Studio, and then process the entire package just to try out the
+effect of the edit. It may be faster to copy the edited version of just
+the one function, and paste it into the R Console. After a while, you
+can lose track of which variant version is which -- there may be one
+version that is in the global environment, and another variant version
+that is associated with the package. Unfortunately, the scoping
+mechanism may invoke the version that you did not intend, and it can be
+confusing as to why your edits did not seem to take effect.
+
+To help resolve this type of conflict, I have provided two functions
+*conflictOfInterest()* and *conflictOfInterestRestricted(packs)* in the *NoviceDeveloperResources* package. The second version restricts the output of the first version to those packages specified in *packs*. This makes the output a little more focused for a human reader.
+
+As shown in Figure 5, there is a conflict for my function *mapfile()*.
+While fine tuning this function, I inadvertently generated a version
+that is in the *cardUtils* package as well as a version that I had
+unwisely pasted into the global environment of the R Console.
+
+![](Picture5.jpg)
+
+
+
+Figure 5. Partial result of invoking conflictOfInterest().

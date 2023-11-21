@@ -1,0 +1,15 @@
+0126fdd823f6158ef47e7acbe802599d *DESCRIPTION
+6a62eaca97f61b69b6d22a94ea8e5c87 *NAMESPACE
+043996b34eef6f53543bb318dac74a40 *R/NoviceDeveloperResources.R
+44843589f359d38da5b1d4e36e899676 *build/vignette.rds
+a153268901c59ea82665afa9414961ac *inst/doc/NoviceDeveloperResources.Rmd
+4830e4529ad6f860b39adc1942a98eb7 *inst/doc/NoviceDeveloperResources.html
+d75960e543f42f42fcb973ec162175f9 *man/checkBuildInstallSourcePackage.Rd
+1ae64cad607cf77d6cd0a8aa44758014 *man/conflictOfInterest.Rd
+761990e574ab2cb886ba6376bbdb3260 *man/conflictOfInterestRestricted.Rd
+a153268901c59ea82665afa9414961ac *vignettes/NoviceDeveloperResources.Rmd
+93ba7d1898f9610393edb91b88ee9f33 *vignettes/Picture1.jpg
+c1e07063bb923cc56c38c15cada2f128 *vignettes/Picture2.jpg
+b08133ce16fe128625fa481d8be7d617 *vignettes/Picture3.jpg
+f7356cc08606b5acf0ae1ab85dbbb31b *vignettes/Picture4.jpg
+80f2348cab2c3216dee4565919865002 *vignettes/Picture5.jpg
