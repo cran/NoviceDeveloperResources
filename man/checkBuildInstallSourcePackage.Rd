@@ -4,12 +4,16 @@
 \alias{checkBuildInstallSourcePackage}
 \title{checkBuildInstallSourcePackage}
 \usage{
-checkBuildInstallSourcePackage(dir, packs)
+checkBuildInstallSourcePackage(dir, packs, packCheck, autoLibrary = FALSE)
 }
 \arguments{
 \item{dir}{character string containing the path name of the directory holding the package folders}
 
 \item{packs}{character vector of the names of the packages}
+
+\item{packCheck}{character vector of the names of the packages to check()}
+
+\item{autoLibrary}{Boolean if TRUE automate library() command altering search path}
 }
 \value{
 returns a character string that can be printed using "echo" and then

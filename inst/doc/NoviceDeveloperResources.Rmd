@@ -9,6 +9,10 @@ vignette: >
   %\VignetteEncoding{UTF-8}
 ---
 
+<style>
+body {
+text-align: justify}
+</style>
 
 <p class=MsoNormal align=center style='text-align:center'><b style='mso-bidi-font-weight:
 normal'><span style='font-size:16.0pt;font-family:"Times New Roman",serif'><o:p>&nbsp;</o:p></span></b></p>
@@ -69,6 +73,17 @@ avoid cluttering up the main R Console window.
 
 Figure 1. Output of library() command.
 
+You can confirm that you have in fact successfully installed the package
+into the library by checking that it has the expected creation time (Figure 1a).
+I mention this because I have had problems replacing an older version of the
+package with the newer version when using the R Studio "Clean and Install"
+button. Fortunately this problem does not occur with
+*checkBuildInstallSourcePackage()* (see below).
+
+![](Picture1a.jpg){width=100%}
+
+Figure 1a. Creation time of installed package in the library
+
 The installed libraries are not directly available for your use, until
 you have *attached* them or (in different words for the same thing)
 *loaded* them to your *search* path. Here we encounter the confusing
@@ -84,7 +99,7 @@ completely different meaning, and the opposite command is
 
 which removes the package from the search path.
 
-To make matters even more confusing, the argument to *install.packages()* is the package-name in quotation marks; the argument to *library()* is the package-name without quotation marks; and the argument to *detach()* is the form of the package-name that appears as the output of *search()*, which is like *package:package-name* without quotation marks!
+To make matters even more confusing, the argument to *install.packages()* is the *"package-name"* in quotation marks; the argument to *library()* is the *package-name* with or without quotation marks; and the argument to *detach()* is the form of the package-name that appears as the output of *search()*, which is like *package:package-name* with or without quotation marks!
 
 You can confirm that you have successfully loaded or removed the package
 by issuing
@@ -147,11 +162,43 @@ them, the process can become quite repetitive, confusing, and tedious.
 To facilitate this, within the *NoviceDeveloperResources* package I have
 provided the function
 
-**checkBuildInstallSourcePackage(dir,packs)**
+**x<-checkBuildInstallSourcePackage(dir,packs,packCheck,autoLibrary)**
 
 where *dir* is a character string containing the path name of the
-directory holding the package folders, and *packs* is a character vector
-of the names of the packages.
+directory holding the package folders, *packs* is a character vector
+of the names of the packages, *packCheck* is a character vector
+of the names of the packages (within *packs*) to subject to *check()*,
+and *autoLibrary* is a Boolean discussed just below.
+
+The parameter *packCheck* allows the user to speed up the development process by
+specifying a subset of *packs* to subject to the rather lengthy *check()*. Of course, 
+when the final packages are to be processed, *packCheck* should include all of *packs*. 
+
+The return value x contains a character vector that can be viewed in the proper
+format by
+
+**cat(x)**
+
+The output is shown in Figure 5. These lines can be copied and pasted into the
+R Console to load the current version of the packages into the search path. This
+is offered as an alternative to inclusion in the *checkBuildInstallSourcePackage()*
+function, as it is [not permitted to automate code that can alter the user's search
+path](https://stackoverflow.com/questions/64737686/why-library-or-require-should-not-be-used-in-a-r-package).
+
+![](Picture5.jpg)
+
+
+
+Figure 5. Output of cat(x)
+
+There is a workaround to the safer (albeit more tredious) *cat(x)* procedure. If the Boolean parameter *autoLibrary* is set to TRUE, then we can bypass *cat(x)* and automate the *detach()* and *library()* procedures, by generating those commands using the *eval(parse())* mechanism. This essentially tricks R Studio into not recognizing that we are indirectly generating the forbidden *library()* call.
+
+If you are running *checkBuildInstallSourcePackage()*
+because you modified a certain package, then *packs* should include the name of
+that package as well as any other packages which *import()* that package. Otherwise
+those other packages may remain linked to the obsoleted version of that package. Furthermore, the names of these packages in the input list *packs* must be in the correct order so that the upper level packages *import()* the new version of the leaf node packages, rather than simply once again *import()* the obsolete version. This could be figured out manually, but the process is tedious and error-prone.
+
+My related CRAN package *NoviceDeveloperResources2* contains an integrated program *sortedInputForCheckBuildInstallSourcePackageDriver()* to invoke *checkBuildInstallSourcePackage()* with the package names in the correct order within *packs*, as well as to check for conflicts, as discussed in the immediately following section.
 
 <center>
 **CONFLICT RESOLUTION**
@@ -173,13 +220,13 @@ confusing as to why your edits did not seem to take effect.
 To help resolve this type of conflict, I have provided two functions
 *conflictOfInterest()* and *conflictOfInterestRestricted(packs)* in the *NoviceDeveloperResources* package. The second version restricts the output of the first version to those packages specified in *packs*. This makes the output a little more focused for a human reader.
 
-As shown in Figure 5, there is a conflict for my function *mapfile()*.
+As shown in Figure 6, there is a conflict for my function *mapfile()*.
 While fine tuning this function, I inadvertently generated a version
 that is in the *cardUtils* package as well as a version that I had
 unwisely pasted into the global environment of the R Console.
 
-![](Picture5.jpg)
+![](Picture6.jpg){width=40%}
 
 
 
-Figure 5. Partial result of invoking conflictOfInterest().
+Figure 6. Partial result of invoking conflictOfInterest().

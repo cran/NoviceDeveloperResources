@@ -7,6 +7,8 @@
 #'
 #' @param dir character string containing the path name of the directory holding the package folders
 #' @param packs character vector of the names of the packages
+#' @param packCheck character vector of the names of the packages to check()
+#' @param autoLibrary Boolean if TRUE automate library() command altering search path
 #'
 #' @details
 #' I wanted to include "library(packs)" in the program, but this is not allowed.
@@ -18,7 +20,7 @@
 #'
 #' @export
 checkBuildInstallSourcePackage<-
-  function(dir,packs) {
+  function(dir,packs,packCheck,autoLibrary=FALSE) {
     l<-list()
     returnStr<-""
     for(pack in packs) {
@@ -27,8 +29,10 @@ checkBuildInstallSourcePackage<-
       on.exit(setwd(oldwd))
       setwd(p)
       
-      # check local source package
-      devtools::check()
+      # check() local source package
+      # to save time, check() only those packs in packCheck
+      if(pack %in% packCheck)
+        devtools::check()
       
       # build local .tar.gz source file
       devtools::document(roclets = c('rd', 'collate', 'namespace', 'vignette'))
@@ -37,11 +41,18 @@ checkBuildInstallSourcePackage<-
       # install package from local .tar.gz file
       install.packages(b,repos=NULL,type='source')
       
-      # returns a character string that can be printed using
+      # https://stackoverflow.com/questions/64737686/why-library-or-require-should-not-be-used-in-a-r-package
+      # instead returns a character string that can be printed using
       # cat [return value of checkBuildInstallSourcePackage()]
-      #  and then copy and paste by the user to load or update the packages
-      returnStr<-sprintf("%s\ndetach(%s)",returnStr,pack)
+      # and then copy and paste by the user to load or update the packages
+      returnStr<-sprintf("%s\ndetach(\"package:%s\")",returnStr,pack)
       returnStr<-sprintf("%s\nlibrary(%s)",returnStr,pack)
+      
+      # workaround for not being able to directly include library() in package code
+      if(autoLibrary) {
+        eval(parse(text = sprintf("detach(\"package:%s\")",pack)))
+        eval(parse(text = sprintf("library(%s)",pack)))
+      }
     }
     return(returnStr)
   }
@@ -126,20 +137,27 @@ conflictOfInterestRestricted<-
     # names(xu) are like "mapfile.cardUtils" (i.e., function.package)
     ssp<-strsplit(names(xu[wp]),".",TRUE)
     ssg<-strsplit(names(xu[wg]),".",TRUE)
-
-    # we are only interested on examining conflicted functions in BOTH packs AND in GLOBAL ENVIRONMENT
-    fp<-vector("character",length(ssp))
-    for(i in 1:length(ssp))
-      fp[i]<-ssp[[i]][1]
-    # fp is like "mapfile"   "norm"      "relaxCols"
-
-    fg<-vector("character",length(ssg))	
-    for(i in 1:length(ssg))
-      fg[i]<-ssg[[i]][1]
-    # fg is like "conflicts" "mapfile"   "relaxCols"
-
-    foi<-intersect(fp,fg) # functions of interest
-    w<-which(names(x) %in% foi)
     
-    return(x[w]) # conflictOfInterest() restricted to functions of interest
+    # we are only interested on examining conflicted functions in BOTH packs AND in GLOBAL ENVIRONMENT
+    if(length(ssp)>1 & length(ssg)>1) {
+      fp<-vector("character",length(ssp))
+      for(i in 1:length(ssp))
+       fp[i]<-ssp[[i]][1]
+      # fp is like "mapfile"   "norm"      "relaxCols"
+
+      fg<-vector("character",length(ssg))	
+      for(i in 1:length(ssg))
+        fg[i]<-ssg[[i]][1]
+      # fg is like "conflicts" "mapfile"   "relaxCols"
+
+      foi<-intersect(fp,fg) # functions of interest
+      
+      w<-which(names(x) %in% foi)
+    
+     if(length(w)>0)
+      return(x[w]) # conflictOfInterest() restricted to functions of interest
+    else
+        return(NULL)
+    }
+    return(NULL)
 }
