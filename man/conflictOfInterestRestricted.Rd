@@ -16,3 +16,11 @@ returns a subset of the return value of conflictOfInterest()
 restrict the conflicted functions (retrieved by conflictOfInterest())
 to those in user-specified packages
 }
+\examples{
+\dontrun{
+# you need to specify packs that are on your own computer !!
+pack<-c("retrieve","tcpflow")
+conflictOfInterestRestricted(pack)
+}
+
+}

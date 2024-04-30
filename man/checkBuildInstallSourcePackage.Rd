@@ -16,8 +16,14 @@ checkBuildInstallSourcePackage(dir, packs, packCheck, autoLibrary = FALSE)
 \item{autoLibrary}{Boolean if TRUE automate library() command altering search path}
 }
 \value{
-returns a character string that can be printed using "echo" and then
+returns a list whose components are
+\itemize{
+\item
+character string that can be printed using "echo" and then
 copy and paste by the user to load or update the packages
+\item
+return value of dateTable()
+}
 }
 \description{
 check, build, and install local source package
@@ -26,4 +32,14 @@ check, build, and install local source package
 I wanted to include "library(packs)" in the program, but this is not allowed.
 The user can "cat" the return value and copy and paste to facilitate doing
 this manually.
+}
+\examples{
+\dontrun{
+# you need to specify dir, packs that are on your own computer !!
+dir1<-"~/personal/hearts/hearts_card_game_bayesian_inference"
+dir2<-"packages/inference_packages/inference_packages/"
+packs<-c("cardUtils","clickableImageMap")
+l<-checkBuildInstallSourcePackage(sprintf("\%s/\%s",dir1,dir2),packs,packs,TRUE)
+}
+
 }
